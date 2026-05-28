@@ -3,7 +3,11 @@
 import { logout } from "@/lib/auth/client";
 import { useState } from "react";
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+    className?: string;
+}
+
+export default function LogoutButton({ className = "" }: LogoutButtonProps) {
     const [loading, setLoading] = useState(false);
 
     async function handleLogout() {
@@ -22,9 +26,13 @@ export default function LogoutButton() {
         <button
             onClick={handleLogout}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+            className={`inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-destructive/50 disabled:opacity-50 bg-destructive/10 text-destructive hover:bg-destructive/20 ${className}`}
         >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
             {loading ? "Logging out..." : "Logout"}
         </button>
     );
 }
+
