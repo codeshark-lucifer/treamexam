@@ -135,7 +135,7 @@ export default function Authentication({
                 );
 
                 window.location.replace(
-                    "/dashboard"
+                    "/user/dashboard"
                 );
 
                 return;
@@ -218,7 +218,7 @@ export default function Authentication({
             );
 
             window.location.replace(
-                "/dashboard"
+                "/user/dashboard"
             );
         } catch (
             error: any
@@ -245,7 +245,7 @@ export default function Authentication({
             await loginGoogle();
 
             window.location.replace(
-                "/dashboard"
+                "/user/dashboard"
             );
         } catch (
             error: any
