@@ -7,6 +7,7 @@ import LogoutButton from "@/lib/auth/LogoutButton";
 import Image from "next/image";
 
 import { useTranslation, LanguageToggle } from "@/lib/translate";
+import { ThemeToggle } from "@/lib/theme";
 
 interface SidebarProps {
     user: {
@@ -76,9 +77,15 @@ export function Sidebar({ user }: SidebarProps) {
                         </Link>
                     </div>
 
-                    <div className="mb-8 p-3 bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] flex items-center justify-between shadow-sm">
-                        <span className="text-sm font-bold text-[var(--muted)]">ភាសា / Language</span>
-                        <LanguageToggle />
+                    <div className="mb-8 space-y-2">
+                        <div className="p-2 bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] flex items-center justify-between shadow-sm">
+                            <span className="text-[10px] font-black uppercase text-[var(--muted)] px-2">Theme</span>
+                            <ThemeToggle className="w-8 h-8" />
+                        </div>
+                        <div className="p-2 bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] flex items-center justify-between shadow-sm">
+                            <span className="text-[10px] font-black uppercase text-[var(--muted)] px-2">Language</span>
+                            <LanguageToggle />
+                        </div>
                     </div>
 
                     <nav className="flex-1 space-y-2">

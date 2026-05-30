@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { TranslationProvider } from "@/lib/translate";
+import { ThemeProvider } from "@/lib/theme";
 
 export default function RootLayout({
   children,
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html
       lang="km"
       className={`${kantumruyPro.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -32,9 +34,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full bg-background text-foreground font-sans selection:bg-primary/30">
-        <TranslationProvider>
-          {children}
-        </TranslationProvider>
+        <ThemeProvider>
+          <TranslationProvider>
+            {children}
+          </TranslationProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

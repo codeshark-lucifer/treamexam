@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslation, LanguageToggle } from "@/lib/translate";
+import { ThemeToggle } from "@/lib/theme";
 
 interface HomeClientProps {
   user: any;
@@ -67,7 +68,8 @@ export default function HomeClient({ user }: HomeClientProps) {
             />
           </Link>
           
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <LanguageToggle />
           </div>
         </header>
