@@ -4,11 +4,9 @@ import ProfileEditor from "./ProfileEditor";
 
 export default async function ProfilePage() {
     const sessionUser = await (async () => {
-        // Fallback for requireUser to avoid redirect loops in research/dev
-        // though it's better to use it as intended
         const { requireUser } = await import("@/lib/auth/server");
         return await requireUser();
-    })();
+    })() as any;
     
     // Fetch detailed user data from Firestore
     const userDoc = await adminFirestore.collection("users").doc(sessionUser.uid).get();
@@ -26,7 +24,7 @@ export default async function ProfilePage() {
     const user = {
         uid: sessionUser.uid,
         email: sessionUser.email,
-        displayName: userData.displayName || sessionUser.name || "",
+        displayName: userData.displayName || sessionUser.displayName || "",
         firstName: userData.firstName || "",
         lastName: userData.lastName || "",
         role: sessionUser.role || "user",

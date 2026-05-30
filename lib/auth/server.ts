@@ -27,6 +27,7 @@ export async function getCurrentUser() {
         
         return {
             ...decodedToken,
+            displayName: userData?.displayName || decodedToken.name || null,
             role: userData?.role || decodedToken.role || ROLES.USER
         };
     } catch (error) {

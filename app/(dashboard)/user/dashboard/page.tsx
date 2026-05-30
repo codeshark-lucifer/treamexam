@@ -12,7 +12,7 @@ import ProgressChart from "@/components/ProgressChart";
 import { adminFirestore } from "@/lib/firebase-admin";
 
 export default async function UserDashboardPage() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser() as any;
 
   if (!user) {
     redirect("/auth/login");
@@ -102,7 +102,7 @@ export default async function UserDashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
           Welcome back,{" "}
-          {userData.displayName || user.name || user.email?.split("@")[0]}!
+          {userData.displayName || user.displayName || user.email?.split("@")[0]}!
         </p>
       </div>
 

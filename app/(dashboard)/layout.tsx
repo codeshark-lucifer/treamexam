@@ -7,7 +7,7 @@ export default async function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser() as any;
 
     if (!user) {
         redirect("/auth/login");
@@ -15,7 +15,7 @@ export default async function DashboardLayout({
 
     const userData = {
         email: user.email,
-        displayName: user.name || user.email?.split("@")[0] || "User",
+        displayName: user.displayName || user.email?.split("@")[0] || "User",
         role: user.role || "user",
     };
 
