@@ -52,7 +52,7 @@ export function middleware(
     ) {
         return NextResponse.redirect(
             new URL(
-                "/dashboard",
+                "/user/dashboard",
                 req.url
             )
         );

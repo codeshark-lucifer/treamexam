@@ -13,7 +13,7 @@ export default async function ProfilePage() {
                         Your Profile
                     </h1>
                     <div className="flex gap-4">
-                        <Link href="/dashboard" className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                        <Link href="/user/dashboard" className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
                             Dashboard
                         </Link>
                         <LogoutButton />

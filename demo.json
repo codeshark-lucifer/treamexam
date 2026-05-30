@@ -1,0 +1,179 @@
+{
+  "data": {
+    "categories": [
+      {
+        "id": "education",
+        "titleKh": "ក្រសួងអប់រំ យុវជន និងកីឡា",
+        "titleEn": "Ministry of Education Youth and Sport",
+        "shortTitleKh": "អប់រំ",
+        "shortTitleEn": "Education",
+        "image": "/images/education.png",
+        "color": "#3467d6"
+      },
+      {
+        "id": "health",
+        "titleKh": "ក្រសួងសុខាភិបាល",
+        "titleEn": "Ministry of Health",
+        "shortTitleKh": "សុខាភិបាល",
+        "shortTitleEn": "Health",
+        "image": "/images/health.png",
+        "color": "#039bb8"
+      },
+      {
+        "id": "interior",
+        "titleKh": "ក្រសួងមហាផ្ទៃ",
+        "titleEn": "Ministry of Interior",
+        "shortTitleKh": "មហាផ្ទៃ",
+        "shortTitleEn": "Interior",
+        "image": "/images/police.svg",
+        "color": "#d88718"
+      },
+      {
+        "id": "civil",
+        "titleKh": "ក្រសួងមុខងារសាធារណៈ",
+        "titleEn": "Ministry of Civil Service",
+        "shortTitleKh": "មុខងារសាធារណៈ",
+        "shortTitleEn": "Civil Service",
+        "image": "/images/MSC.png",
+        "color": "#25845a"
+      },
+      {
+        "id": "agriculture",
+        "titleKh": "ក្រសួងកសិកម្ម រុក្ខាប្រមាញ់ និងនេសាទ",
+        "titleEn": "Ministry of Agriculture Forestry and Fisheries",
+        "shortTitleKh": "កសិកម្ម",
+        "shortTitleEn": "Agriculture",
+        "image": "/images/MAFF.png",
+        "color": "#b88311"
+      }
+    ],
+
+    "exams": [
+      {
+        "id": "mixed",
+        "categoryId": "education",
+        "titleKh": "វិញ្ញាសាចម្រុះ",
+        "titleEn": "Mixed Exam",
+        "icon": "fa-solid fa-layer-group",
+        "descriptionKh": "វិញ្ញាសាចម្រុះសម្រាប់ត្រៀមប្រឡង",
+        "descriptionEn": "Mixed questions for exam preparation"
+      },
+      {
+        "id": "culture",
+        "categoryId": "education",
+        "titleKh": "វប្បធម៌ទូទៅ",
+        "titleEn": "General Culture",
+        "icon": "fa-solid fa-earth-asia",
+        "descriptionKh": "សំណួរវប្បធម៌ទូទៅ",
+        "descriptionEn": "General knowledge questions"
+      },
+      {
+        "id": "primary",
+        "categoryId": "education",
+        "titleKh": "គ្រូបឋមសិក្សា",
+        "titleEn": "Primary Teacher Exam",
+        "icon": "fa-solid fa-school",
+        "descriptionKh": "សំណួរសម្រាប់គ្រូបឋម",
+        "descriptionEn": "Questions for primary teacher exam"
+      },
+      {
+        "id": "secondary",
+        "categoryId": "education",
+        "titleKh": "គ្រូអនុវិទ្យាល័យ",
+        "titleEn": "Secondary Teacher Exam",
+        "icon": "fa-solid fa-graduation-cap",
+        "descriptionKh": "សំណួរសម្រាប់គ្រូអនុវិទ្យាល័យ",
+        "descriptionEn": "Questions for secondary teacher exam"
+      }
+    ],
+
+    "questions": [
+      {
+        "id": "q001",
+        "categoryId": "education",
+        "examType": "mixed",
+        "questionKh": "តើ STEM មានន័យអ្វី?",
+        "questionEn": "What does STEM stand for?",
+        "optionsKh": [
+          "វិទ្យាសាស្ត្រ បច្ចេកវិទ្យា វិស្វកម្ម និងគណិតវិទ្យា",
+          "ភាសា ប្រវត្តិសាស្ត្រ និងសិល្បៈ",
+          "សេដ្ឋកិច្ច និងច្បាប់",
+          "កីឡា និងសុខភាព"
+        ],
+        "optionsEn": [
+          "Science Technology Engineering Mathematics",
+          "Language History and Art",
+          "Economics and Law",
+          "Sports and Health"
+        ],
+        "answer": 0,
+        "tags": ["stem", "education"]
+      },
+
+      {
+        "id": "q002",
+        "categoryId": "education",
+        "examType": "primary",
+        "questionKh": "តើសាលាកុមារមេត្រីមានប៉ុន្មានសមាសភាគ?",
+        "questionEn": "How many components does Child Friendly School have?",
+        "optionsKh": [
+          "៦",
+          "៤",
+          "៥",
+          "៧"
+        ],
+        "optionsEn": [
+          "6",
+          "4",
+          "5",
+          "7"
+        ],
+        "answer": 0,
+        "tags": ["primary"]
+      },
+
+      {
+        "id": "q003",
+        "categoryId": "health",
+        "examType": "mixed",
+        "questionKh": "តើការលាងដៃជួយការពារអ្វី?",
+        "questionEn": "What does hand washing help prevent?",
+        "optionsKh": [
+          "ការឆ្លងមេរោគ",
+          "ការកកស្ទះចរាចរណ៍",
+          "ការបាត់ឯកសារ",
+          "ការប្រឡងធ្លាក់"
+        ],
+        "optionsEn": [
+          "Infection",
+          "Traffic jam",
+          "Losing documents",
+          "Exam failure"
+        ],
+        "answer": 0,
+        "tags": ["health"]
+      },
+      {
+        "id": "q005",
+        "categoryId": "education",
+        "examType": "primary",
+        "questionKh": "តើសាលាកុមារមេត្រីមានប៉ុន្មានសមាសភាគ?",
+        "questionEn": "How many components does Child Friendly School have?",
+        "optionsKh": [
+          "៦",
+          "៤",
+          "៥",
+          "៧"
+        ],
+        "optionsEn": [
+          "6",
+          "4",
+          "5",
+          "7"
+        ],
+        "answer": 0,
+        "tags": ["primary"]
+      }
+    ]
+  }
+}

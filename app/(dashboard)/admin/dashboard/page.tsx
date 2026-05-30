@@ -1,9 +1,17 @@
 import { requireAdmin } from "@/lib/auth/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { adminFirestore } from "@/lib/firebase-admin";
 
 export default async function AdminDashboardPage() {
     const user = await requireAdmin();
+
+    // Fetch real stats
+    const usersCount = await adminFirestore.collection("users").count().get();
+    const totalUsers = usersCount.data().count;
+
+    const resultsCount = await adminFirestore.collection("results").count().get();
+    const totalResults = resultsCount.data().count;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -27,21 +35,20 @@ export default async function AdminDashboardPage() {
                         </svg>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">1,248</div>
-                        <p className="text-xs text-muted-foreground">+12% from last month</p>
+                        <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">Registered students</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Exams</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Exams</CardTitle>
                         <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">42</div>
-                        <p className="text-xs text-muted-foreground">Currently in progress</p>
+                        <div className="text-2xl font-bold">{totalResults.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">Completed assessments</p>
                     </CardContent>
                 </Card>
                 <Card>

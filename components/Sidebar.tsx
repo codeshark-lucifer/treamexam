@@ -28,6 +28,15 @@ export function Sidebar({ user }: SidebarProps) {
             ),
         },
         {
+            label: "Browse Exams",
+            href: "/category",
+            icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            ),
+        },
+        {
             label: "Profile",
             href: "/user/profile",
             icon: (
@@ -52,7 +61,15 @@ export function Sidebar({ user }: SidebarProps) {
 
     return (
         <>
-            {/* Mobile Sidebar Overlay */}
+            {/* Mobile Backdrop */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 md:hidden"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* Mobile Toggle Button (only when closed) */}
             {!isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}

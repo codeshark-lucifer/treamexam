@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { adminAuth } from "@/lib/firebase-admin";
+import { adminAuth, adminFirestore } from "@/lib/firebase-admin";
 import { redirect } from "next/navigation";
 import { ROLES } from "./role";
 
@@ -21,7 +21,14 @@ export async function getCurrentUser() {
             true
         );
 
-        return decodedToken;
+        // 🔥 IMPORTANT: Fetch latest role from Firestore to allow manual overrides
+        const userDoc = await adminFirestore.collection("users").doc(decodedToken.uid).get();
+        const userData = userDoc.data();
+        
+        return {
+            ...decodedToken,
+            role: userData?.role || decodedToken.role || ROLES.USER
+        };
     } catch (error) {
         return null;
     }
@@ -45,7 +52,7 @@ export async function requireAdmin() {
     }
 
     if (user.role !== ROLES.ADMIN) {
-        redirect("/dashboard");
+        redirect("/user/dashboard");
     }
 
     return user;
