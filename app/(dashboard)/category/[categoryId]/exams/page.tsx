@@ -1,16 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
-
-import { Button } from "@/components/ui/Button";
-
 interface Category {
   id: string;
   titleKh: string;
@@ -60,7 +50,6 @@ async function getExams(categoryId: string): Promise<Exam[]> {
   return data.data ?? [];
 }
 
-// 🔥 NEW: get question count per exam
 async function getQuestionCount(
   categoryId: string,
   examId: string,
@@ -92,10 +81,9 @@ export default async function CategoryExamsPage({
   const exams = await getExams(categoryId);
 
   if (!category) {
-    return <div className="py-20 text-center">Category not found</div>;
+    return <div className="py-20 text-center text-[var(--muted)]">រកមិនឃើញប្រភេទវិញ្ញាសាឡើយ</div>;
   }
 
-  // 🔥 Fetch counts in parallel
   const examsWithCounts = await Promise.all(
     exams.map(async (exam) => {
       const count = await getQuestionCount(categoryId, exam.id);
@@ -108,66 +96,55 @@ export default async function CategoryExamsPage({
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
       {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+      <div className="bg-[var(--surface)] p-6 rounded-[var(--radius)] border border-[var(--line)] shadow-sm">
+        <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)]">
           {category.titleKh}
         </h1>
-
-        <p className="mt-2 text-muted-foreground">{category.titleEn}</p>
+        <p className="mt-1 text-[var(--muted)] font-medium">{category.titleEn}</p>
       </div>
 
       {/* EXAMS */}
       {examsWithCounts.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {examsWithCounts.map((exam) => (
-            <Card
+            <Link 
               key={exam.id}
-              className="group transition-all hover:border-primary/50 hover:shadow-md"
+              href={`/category/${categoryId}/exam/${exam.id}`}
+              className="group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] flex items-center gap-4 p-5 transition-all hover:shadow-lg hover:-translate-y-1"
             >
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  {exam.icon && (
-                    <i className={`${exam.icon} text-2xl text-primary`} />
-                  )}
+              <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--secondary)] text-[var(--primary)] flex items-center justify-center text-xl shrink-0">
+                <i className={`${exam.icon || 'fa-solid fa-graduation-cap'}`} />
+              </div>
 
-                  <div>
-                    <CardTitle>{exam.titleKh}</CardTitle>
-
-                    <CardDescription>{exam.titleEn}</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent>
-                <p className="mb-2 text-sm">{exam.descriptionKh}</p>
-
-                <p className="mb-6 text-sm text-muted-foreground">
-                  {exam.descriptionEn}
+              <div className="flex-grow">
+                <h3 className="font-bold text-lg leading-tight group-hover:text-[var(--primary)] transition-colors">
+                  {exam.titleKh}
+                </h3>
+                <p className="text-sm text-[var(--muted)] mt-1 line-clamp-1">
+                  {exam.titleEn}
                 </p>
-
-                {/* 🔥 REAL COUNT */}
-                <div className="mb-6 flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Mixed Questions</span>
-
-                  <span>{exam.count} Questions</span>
+                <div className="mt-2 flex items-center gap-2">
+                   <span className="text-[10px] font-black uppercase bg-[var(--secondary)] text-[var(--primary)] px-2 py-0.5 rounded">
+                     {exam.count} សំណួរ / Questions
+                   </span>
                 </div>
+              </div>
 
-                <Link href={`/category/${categoryId}/exam/${exam.id}`}>
-                  <Button className="w-full">Start Exam</Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <i className="fa-solid fa-chevron-right text-[var(--muted)] group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all" />
+            </Link>
           ))}
         </div>
       ) : (
-        <Card className="border-dashed p-12 text-center">
-          <p className="text-muted-foreground">
-            No exams available for this category yet.
+        <div className="bg-[var(--surface)] border border-[var(--line)] border-dashed rounded-[var(--radius)] p-12 text-center">
+          <i className="fa-solid fa-folder-open text-4xl text-[var(--line)] mb-4 block"></i>
+          <p className="text-[var(--muted)] font-medium">
+            មិនទាន់មានវិញ្ញាសានៅក្នុងប្រភេទនេះនៅឡើយទេ។
           </p>
-        </Card>
+        </div>
       )}
     </div>
   );
 }
+

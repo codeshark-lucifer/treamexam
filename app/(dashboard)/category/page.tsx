@@ -2,15 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { headers } from "next/headers";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-
 interface Category {
   id: string;
   titleKh: string;
@@ -56,63 +47,50 @@ export default async function BrowseCategoriesPage() {
   const categories = await getCategories();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Browse Categories</h1>
-
-        <p className="text-muted-foreground">
-          Select a subject area to view available exams.
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      <div className="bg-[var(--surface)] p-6 rounded-[var(--radius)] border border-[var(--line)] shadow-sm">
+        <h1 className="text-2xl md:text-3xl font-bold text-[var(--primary)]">ជ្រើសរើសវិញ្ញាសា / Browse Exams</h1>
+        <p className="text-[var(--muted)] mt-1 font-medium">
+          ជ្រើសរើសក្រសួង ឬស្ថាប័នដើម្បីមើលវិញ្ញាសាដែលមាន។
         </p>
       </div>
 
       {categories.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (
-            <Card
+            <Link 
               key={category.id}
-              className="group flex flex-col overflow-hidden transition-all hover:shadow-lg"
-              style={{
-                borderTop: `4px solid ${category.color}`,
-              }}
+              href={`/category/${category.id}/exams`}
+              className="group relative bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] flex items-center gap-4 p-4 transition-all hover:shadow-xl hover:-translate-y-1"
+              style={{ borderLeft: `5px solid ${category.color || 'var(--primary)'}` }}
             >
-              <CardHeader className="space-y-4">
-                <div className="relative h-40 w-full rounded-lg bg-muted">
-                  <Image
-                    src={category.image}
-                    alt={category.titleEn}
-                    fill
-                    priority
-                    className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-
-                <div>
-                  <CardTitle className="text-lg">{category.titleKh}</CardTitle>
-
-                  <CardDescription className="mt-1">
-                    {category.titleEn}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-
-              <CardContent className="mt-auto">
-                <Link href={`/category/${category.id}/exams`} className="block">
-                  <Button
-                    variant="outline"
-                    className="w-full transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
-                  >
-                    View Exams
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <div className="flex-shrink-0 w-16 h-16 relative">
+                <Image
+                  src={category.image}
+                  alt={category.titleKh}
+                  fill
+                  className="object-contain p-1"
+                />
+              </div>
+              <div className="flex-grow">
+                <h3 className="font-bold text-[15px] leading-snug group-hover:text-[var(--primary)] transition-colors" style={{ color: category.color || 'var(--primary)' }}>
+                  {category.titleKh}
+                </h3>
+                <p className="text-[12px] text-[var(--muted)] mt-1 line-clamp-1">
+                  {category.titleEn}
+                </p>
+              </div>
+              <i className="fa-solid fa-chevron-right text-[var(--muted)] group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all"></i>
+            </Link>
           ))}
         </div>
       ) : (
-        <div className="flex min-h-[300px] items-center justify-center">
-          <p className="text-muted-foreground">No categories found.</p>
+        <div className="bg-[var(--surface)] border border-[var(--line)] border-dashed rounded-[var(--radius)] p-12 text-center">
+          <i className="fa-solid fa-folder-open text-4xl text-[var(--line)] mb-4 block"></i>
+          <p className="text-[var(--muted)] font-medium">មិនទាន់មានប្រភេទវិញ្ញាសាឡើយ។</p>
         </div>
       )}
     </div>
   );
 }
+

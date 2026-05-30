@@ -1,12 +1,5 @@
 import { getCurrentUser } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
 import RecentActivity from "@/components/RecentActivity";
 import ProgressChart from "@/components/ProgressChart";
 import { adminFirestore } from "@/lib/firebase-admin";
@@ -97,153 +90,103 @@ export default async function UserDashboardPage() {
   const totalUsers = totalUsersCount.data().count;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back,{" "}
-          {userData.displayName || user.displayName || user.email?.split("@")[0]}!
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      <div className="bg-[var(--surface)] p-6 rounded-[var(--radius)] border border-[var(--line)] shadow-sm">
+        <h1 className="text-3xl font-bold text-[var(--primary)]">ផ្ទាំងគ្រប់គ្រង / Dashboard</h1>
+        <p className="text-[var(--muted)] mt-1 font-medium">
+          សូមស្វាគមន៍ត្រឡប់មកវិញ,{" "}
+          <span className="text-[var(--primary)] font-bold">{userData.displayName || user.displayName || user.email?.split("@")[0]}</span>!
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Exams</CardTitle>
-            <svg
-              className="h-4 w-4 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalExams}</div>
-            <p className="text-xs text-muted-foreground">
-              Completed assessments
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-            <svg
-              className="h-4 w-4 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{avgScore}%</div>
-            <p className="text-xs text-muted-foreground">Overall performance</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Global Rank</CardTitle>
-            <svg
-              className="h-4 w-4 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-              />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">#{rank}</div>
-            <p className="text-xs text-muted-foreground">
-              Out of {totalUsers} students
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Streak</CardTitle>
-            <svg
-              className="h-4 w-4 text-muted-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.99 7.99 0 0120 13a7.98 7.98 0 01-2.343 5.657z"
-              />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {userStreak} Day{userStreak !== 1 ? "s" : ""}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {userStreak > 0 ? "Keep it up!" : "Start your streak today"}
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* STAT CARDS */}
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius)] border border-[var(--line)] shadow-sm flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+             <i className="fa-solid fa-clipboard-check"></i>
+           </div>
+           <div>
+             <p className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-wider">ការប្រឡងសរុប</p>
+             <div className="text-2xl font-black text-[var(--ink)]">{totalExams}</div>
+           </div>
+        </div>
+
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius)] border border-[var(--line)] shadow-sm flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xl">
+             <i className="fa-solid fa-chart-line"></i>
+           </div>
+           <div>
+             <p className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-wider">ពិន្ទុមធ្យម</p>
+             <div className="text-2xl font-black text-[var(--ink)]">{avgScore}%</div>
+           </div>
+        </div>
+
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius)] border border-[var(--line)] shadow-sm flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-xl">
+             <i className="fa-solid fa-trophy"></i>
+           </div>
+           <div>
+             <p className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-wider">ចំណាត់ថ្នាក់</p>
+             <div className="text-2xl font-black text-[var(--ink)]">#{rank}</div>
+           </div>
+        </div>
+
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius)] border border-[var(--line)] shadow-sm flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl">
+             <i className="fa-solid fa-fire"></i>
+           </div>
+           <div>
+             <p className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-wider">កម្រិតសកម្មភាព</p>
+             <div className="text-2xl font-black text-[var(--ink)]">{userStreak} ថ្ងៃ</div>
+           </div>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-            <CardDescription>
-              Your examination progress over time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] border-t border-border mt-4 pt-6">
+      <div className="grid gap-6 lg:grid-cols-7">
+        <div className="lg:col-span-4 bg-[var(--surface)] p-6 rounded-[var(--radius)] border border-[var(--line)] shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+               <i className="fa-solid fa-wave-square text-[var(--primary)]"></i>
+               វឌ្ឍនភាព / Progress
+            </h2>
+          </div>
+          
+          <div className="h-[300px]">
             {totalExams > 5 ? (
               <ProgressChart data={chartResults} />
             ) : (
-              <div className="flex flex-col items-center justify-center h-full space-y-2 text-center">
-                <p className="text-muted-foreground italic">
-                  Complete {6 - totalExams} more exam{6 - totalExams !== 1 ? "s" : ""} to unlock your progress chart.
-                </p>
-                <div className="w-48 h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary transition-all duration-500"
-                    style={{ width: `${(totalExams / 6) * 100}%` }}
-                  />
+              <div className="flex flex-col items-center justify-center h-full space-y-4 text-center">
+                <div className="w-20 h-20 bg-[var(--secondary)] rounded-full flex items-center justify-center">
+                  <i className="fa-solid fa-lock text-[var(--primary)] text-2xl"></i>
                 </div>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold">
-                  {totalExams} / 6 Exams
-                </p>
+                <div>
+                  <p className="text-[var(--muted)] font-bold italic mb-2">
+                    បំពេញ {6 - totalExams} វិញ្ញាសាបន្ថែមទៀតដើម្បីបើកតារាងវឌ្ឍនភាព។
+                  </p>
+                  <div className="w-64 h-3 bg-[var(--line)] rounded-full overflow-hidden mx-auto border border-[var(--line)]">
+                    <div
+                      className="h-full bg-[var(--primary)] transition-all duration-1000"
+                      style={{ width: `${(totalExams / 6) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[var(--muted)] uppercase font-black mt-2 tracking-widest">
+                    {totalExams} / 6 វិញ្ញាសា
+                  </p>
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your last 5 exam attempts.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentActivity results={recentResults} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        <div className="lg:col-span-3 bg-[var(--surface)] p-6 rounded-[var(--radius)] border border-[var(--line)] shadow-sm">
+          <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
+             <i className="fa-solid fa-clock-rotate-left text-[var(--primary)]"></i>
+             សកម្មភាពថ្មីៗ / Activity
+          </h2>
+          <RecentActivity results={recentResults} />
+        </div>
       </div>
     </div>
   );
 }
+

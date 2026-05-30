@@ -32,5 +32,9 @@ export default async function ProfilePage() {
         totalScore
     };
 
-    return <ProfileEditor user={user} />;
+    return (
+        <div className="py-4 md:py-8">
+            <ProfileEditor user={user} />
+        </div>
+    );
 }
