@@ -1,38 +1,74 @@
 import { requireAdmin } from "@/lib/auth/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { adminFirestore } from "@/lib/firebase-admin";
+import { adminFirestore, adminDatabase } from "@/lib/firebase-admin";
+import Link from "next/link";
+import { AdminDashboardHeader } from "./AdminDashboardHeader";
 
 export default async function AdminDashboardPage() {
     const user = await requireAdmin();
 
-    // Fetch real stats
-    const usersCount = await adminFirestore.collection("users").count().get();
-    const totalUsers = usersCount.data().count;
+    // Fetch stats in parallel
+    const [
+        usersCount,
+        resultsCount,
+        categoriesSnap,
+        examsSnap,
+        questionsSnap,
+        recentUsersSnap,
+        recentResultsSnap
+    ] = await Promise.all([
+        adminFirestore.collection("users").count().get(),
+        adminFirestore.collection("results").count().get(),
+        adminDatabase?.ref("data/categories").get(),
+        adminDatabase?.ref("data/exams").get(),
+        adminDatabase?.ref("data/questions").get(),
+        adminFirestore.collection("users").orderBy("updatedAt", "desc").limit(5).get(),
+        adminFirestore.collection("results").orderBy("timestamp", "desc").limit(5).get()
+    ]);
 
-    const resultsCount = await adminFirestore.collection("results").count().get();
+    const totalUsers = usersCount.data().count;
     const totalResults = resultsCount.data().count;
+    const totalCategories = categoriesSnap?.exists() ? Object.keys(categoriesSnap.val()).length : 0;
+    const totalExams = examsSnap?.exists() ? Object.keys(examsSnap.val()).length : 0;
+    const totalQuestions = questionsSnap?.exists() ? Object.keys(questionsSnap.val()).length : 0;
+
+    const recentUsers = recentUsersSnap.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            displayName: data.displayName || null,
+            firstName: data.firstName || null,
+            lastName: data.lastName || null,
+            email: data.email || null,
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : null,
+        };
+    });
+
+    // Fetch user details for recent results for better display
+    const recentResults = await Promise.all(recentResultsSnap.docs.map(async (doc) => {
+        const data = doc.data();
+        const userDoc = await adminFirestore.collection("users").doc(data.userId).get();
+        const userData = userDoc.data();
+        return {
+            id: doc.id,
+            userId: data.userId,
+            examTypeId: data.examTypeId,
+            score: data.score,
+            timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toISOString() : null,
+            userName: userData?.displayName || (userData?.firstName ? `${userData.firstName} ${userData.lastName}` : "Unknown User")
+        };
+    }));
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-primary">Admin Control Center</h1>
-                    <p className="text-muted-foreground">High-level overview of system performance and user activity.</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm">Download Reports</Button>
-                    <Button size="sm">System Settings</Button>
-                </div>
-            </div>
+            <AdminDashboardHeader recentUsers={recentUsers} recentResults={recentResults} />
 
+            {/* Stats Overview */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card className="border-primary/20 bg-primary/5">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                        <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                        <i className="fa-solid fa-users text-primary"></i>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalUsers.toLocaleString()}</div>
@@ -41,10 +77,8 @@ export default async function AdminDashboardPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Exams</CardTitle>
-                        <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
+                        <CardTitle className="text-sm font-medium">Exam Attempts</CardTitle>
+                        <i className="fa-solid fa-file-invoice text-muted-foreground"></i>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalResults.toLocaleString()}</div>
@@ -53,122 +87,124 @@ export default async function AdminDashboardPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">System Uptime</CardTitle>
-                        <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                        <CardTitle className="text-sm font-medium">Content Library</CardTitle>
+                        <i className="fa-solid fa-database text-muted-foreground"></i>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">99.98%</div>
-                        <p className="text-xs text-muted-foreground">Last 30 days</p>
+                        <div className="text-2xl font-bold">{totalQuestions.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">{totalExams} Exams in {totalCategories} Categories</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Support Tickets</CardTitle>
-                        <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                        <CardTitle className="text-sm font-medium">System Status</CardTitle>
+                        <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">5</div>
-                        <p className="text-xs text-muted-foreground">Pending resolution</p>
+                        <div className="text-2xl font-bold">Healthy</div>
+                        <p className="text-xs text-muted-foreground">All systems operational</p>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+                {/* Recent Results */}
                 <Card className="col-span-4">
                     <CardHeader>
-                        <CardTitle>Management Actions</CardTitle>
-                        <CardDescription>Quick access to administrative tasks.</CardDescription>
+                        <CardTitle>Recent Exam Results</CardTitle>
+                        <CardDescription>Latest student performances across all categories.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                            <button className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
-                                <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                </span>
-                                <span className="font-bold">User Management</span>
-                                <span className="text-xs text-muted-foreground">Edit roles and permissions</span>
-                            </button>
-                            <button className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
-                                <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </span>
-                                <span className="font-bold">Exam Catalog</span>
-                                <span className="text-xs text-muted-foreground">Create and manage exams</span>
-                            </button>
-                            <button className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
-                                <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
-                                </span>
-                                <span className="font-bold">Analytics</span>
-                                <span className="text-xs text-muted-foreground">Detailed usage statistics</span>
-                            </button>
-                            <button className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
-                                <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                </span>
-                                <span className="font-bold">Security Logs</span>
-                                <span className="text-xs text-muted-foreground">Monitor system access</span>
-                            </button>
+                        <div className="space-y-4">
+                            {recentResults.map((result: any) => (
+                                <div key={result.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:bg-accent/50 transition-colors">
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-bold">{result.userName}</p>
+                                        <p className="text-xs text-muted-foreground capitalize">
+                                            {result.examTypeId.replace("-", " ")} • {result.timestamp ? new Date(result.timestamp).toLocaleDateString() : "Recently"}
+                                        </p>
+                                    </div>
+                                    <div className={`text-lg font-black ${result.score >= 80 ? "text-green-500" : result.score >= 50 ? "text-yellow-500" : "text-red-500"}`}>
+                                        {result.score}%
+                                    </div>
+                                </div>
+                            ))}
+                            {recentResults.length === 0 && (
+                                <p className="text-center py-4 text-sm text-muted-foreground italic">No recent results found.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Recent Users */}
                 <Card className="col-span-3">
                     <CardHeader>
-                        <CardTitle>System Status</CardTitle>
-                        <CardDescription>Real-time server health.</CardDescription>
+                        <CardTitle>New Registrations</CardTitle>
+                        <CardDescription>Most recently joined students.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span>CPU Usage</span>
-                                    <span className="font-medium">24%</span>
+                        <div className="space-y-4">
+                            {recentUsers.map((u: any) => (
+                                <div key={u.id} className="flex items-center gap-3 p-2">
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                        {(u.displayName || u.firstName || "U").charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">{u.displayName || `${u.firstName} ${u.lastName}`}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate">{u.email}</p>
+                                    </div>
+                                    <div className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                        {u.updatedAt ? new Date(u.updatedAt).toLocaleDateString() : "N/A"}
+                                    </div>
                                 </div>
-                                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                                    <div className="h-full bg-primary w-[24%] transition-all" />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span>Memory Usage</span>
-                                    <span className="font-medium">62%</span>
-                                </div>
-                                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                                    <div className="h-full bg-yellow-500 w-[62%] transition-all" />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span>Storage</span>
-                                    <span className="font-medium">15%</span>
-                                </div>
-                                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                                    <div className="h-full bg-green-500 w-[15%] transition-all" />
-                                </div>
-                            </div>
-
-                            <div className="pt-4 mt-4 border-t border-border/50">
-                                <div className="flex items-center gap-2 text-sm text-green-500 font-medium">
-                                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                                    All systems operational
-                                </div>
-                            </div>
+                            ))}
+                            {recentUsers.length === 0 && (
+                                <p className="text-center py-4 text-sm text-muted-foreground italic">No new users yet.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Management Actions */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Management Actions</CardTitle>
+                    <CardDescription>Quick access to administrative tasks.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <Link href="/admin/users" className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
+                            <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                <i className="fa-solid fa-user-gear"></i>
+                            </span>
+                            <span className="font-bold">User Management</span>
+                            <span className="text-xs text-muted-foreground">Edit roles and permissions</span>
+                        </Link>
+                        <Link href="/admin/exams" className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
+                            <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                <i className="fa-solid fa-layer-group"></i>
+                            </span>
+                            <span className="font-bold">Exam Catalog</span>
+                            <span className="text-xs text-muted-foreground">Create and manage exams</span>
+                        </Link>
+                        <Link href="/admin/analytics" className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
+                            <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                <i className="fa-solid fa-chart-line"></i>
+                            </span>
+                            <span className="font-bold">Analytics</span>
+                            <span className="text-xs text-muted-foreground">Detailed usage statistics</span>
+                        </Link>
+                        <Link href="/admin/logs" className="flex flex-col items-start p-4 rounded-xl border border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all group">
+                            <span className="p-2 rounded-lg bg-primary/10 text-primary mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                <i className="fa-solid fa-shield-halved"></i>
+                            </span>
+                            <span className="font-bold">Security Logs</span>
+                            <span className="text-xs text-muted-foreground">Monitor system access</span>
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
