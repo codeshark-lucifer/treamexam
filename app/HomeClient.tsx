@@ -43,18 +43,20 @@ export default function HomeClient({ user }: HomeClientProps) {
   ] as const;
 
   return (
-    <main className="flex justify-center p-0 md:p-8 min-h-screen">
+    <main className="flex justify-center p-0 md:p-8 min-h-screen animate-in fade-in duration-700">
       <div className="app-shell relative">
         {/* Topbar */}
         <header className="topbar sticky top-0 z-50 bg-[var(--paper)] border-b border-[var(--line)] -mx-[18px] md:-mx-[28px] px-[18px] md:px-[28px] mb-6 flex items-center justify-between h-16">
           <div className="flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--line)]/50 text-[var(--primary)] transition-all active:scale-95"
+              className="relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-full hover:bg-[var(--line)]/50 transition-all active:scale-95 group"
               type="button"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
-              <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
+              <span className={`w-5 h-0.5 bg-[var(--primary)] transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+              <span className={`w-5 h-0.5 bg-[var(--primary)] transition-all duration-300 ${isMenuOpen ? 'opacity-0 scale-0' : ''}`}></span>
+              <span className={`w-5 h-0.5 bg-[var(--primary)] transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
             </button>
           </div>
           
@@ -75,7 +77,7 @@ export default function HomeClient({ user }: HomeClientProps) {
         </header>
 
         {/* Mobile Menu */}
-        <nav className={`mobile-menu ${isMenuOpen ? 'is-open' : ''} bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-2 mb-6 shadow-md overflow-hidden transition-all duration-300`}>
+        <nav className={`mobile-menu ${isMenuOpen ? 'max-h-[500px] opacity-100 mb-6 py-2' : 'max-h-0 opacity-0 mb-0 py-0'} bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] px-2 shadow-md overflow-hidden transition-all duration-500 ease-in-out`}>
           <div className="grid gap-1">
             <Link 
               href="/" 
@@ -194,11 +196,8 @@ export default function HomeClient({ user }: HomeClientProps) {
 
       <style jsx global>{`
         .mobile-menu {
-          display: none;
-          flex-direction: column;
-        }
-        .mobile-menu.is-open {
           display: flex;
+          flex-direction: column;
         }
         .hero-static {
           background: linear-gradient(135deg, var(--primary) 0%, #b37851 100%);
